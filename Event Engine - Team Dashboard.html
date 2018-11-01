@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Event Engine - Team Dashboard</title><!-- base href="https://dashboard.awsgameday.io/" --><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/x-icon" href="https://dashboard.awsgameday.io/favicon.ico"><link href="Event%20Engine%20-%20Team%20Dashboard_files/styles.css" rel="stylesheet"><style>.loading-overlay[_ngcontent-c0]{height:100%}</style><style>.container[_ngcontent-c1]{margin:8pt!important}</style><style>[_nghost-c2]     table{border-spacing:0;border-collapse:collapse;margin-bottom:16px}[_nghost-c2]     table td, [_nghost-c2]     table th{padding:6px 13px;border:1px solid #ddd}[_nghost-c2]     table tr:nth-child(2n){background-color:rgba(0,0,0,.03)}[_nghost-c2]     blockquote{padding:0 1em;color:rgba(0,0,0,.535);border-left:.25em solid rgba(0,0,0,.11)}</style></head><body><app-root _nghost-c0="" ng-version="5.2.11"><!---->
+<div _ngcontent-c0="">
+  <router-outlet _ngcontent-c0=""></router-outlet><app-documentation-viewer _nghost-c1=""><div _ngcontent-c1="" class="container">
+  <h2 _ngcontent-c1="" class="ui header">
+    <i _ngcontent-c1="" class="large info circle icon"></i>
+    <div _ngcontent-c1="" class="content">
+      Documentation
+      <div _ngcontent-c1="" class="sub header">https://s3.amazonaws.com/gdengine-assets-staging.us-east-1/modules/gd2015-loadgen/v0.1/docs/runbook.md</div>
+    </div>
+  </h2>
+  <div _ngcontent-c1="" class="ui divider"></div>
+  <markdown-to-html _ngcontent-c1="" _nghost-c2=""><p><img src="Event%20Engine%20-%20Team%20Dashboard_files/image1.png" style="width:6.5in;height:7.6125in"></p>
+<h1 id="hippogriff-stables-operational-runbook">Hippogriff Stables (?) Operational Runbook</h1>
+<h2 id="document-control">Document Control</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Revision</th>
+<th>Author</th>
+<th>Date</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>.1</td>
+<td>Mike</td>
+<td>3/1/2015</td>
+<td>draft!</td>
+</tr>
+<tr class="even">
+<td>.2</td>
+<td>Dave</td>
+<td>3/14/2015</td>
+<td>draft major updates and fixes</td>
+</tr>
+<tr class="odd">
+<td>1.0</td>
+<td>Dave</td>
+<td>3/21/2015</td>
+<td>final draft! So excited!</td>
+</tr>
+<tr class="even">
+<td>1.1</td>
+<td>Mike</td>
+<td>3/24/2015</td>
+<td>major fixes. Added Troubleshooting after fun with disk drives ;-)</td>
+</tr>
+<tr class="odd">
+<td>2.0</td>
+<td>Dave</td>
+<td>4/1/2015</td>
+<td>migrate to AWS. Removed Troubleshooting: no more physical hardware!</td>
+</tr>
+<tr class="even">
+<td>3.0</td>
+<td>Mike</td>
+<td>4/2/2015</td>
+<td>full rewrite of 2.0. Added Troubleshooting again. Dave is an optimist.</td>
+</tr>
+<tr class="odd">
+<td>4.0</td>
+<td>Dave</td>
+<td>5/13/2015</td>
+<td>full rewrite of 3.0. Added Disaster Recovery for obvious reasons, Mike.</td>
+</tr>
+<tr class="even">
+<td>4.1</td>
+<td>Mike</td>
+<td>5/13/2015</td>
+<td>minor updates to DR section based on the Event as mandated by mgmt.</td>
+</tr>
+<tr class="odd">
+<td>5.0</td>
+<td>Dave</td>
+<td>5/16/2015</td>
+<td>4.1 was a tissue of lies. Rewrote Disaster Recovery based on the latest Event. Last commit before the long nap.</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="introduction">Introduction</h2>
+<p>The Unicorn Rentals website provides cryptographically strong hashes as
+a service. The system is comprised of a client application and a
+standalone server. The system will always return the same hash value for
+a given key. The system builds the hash based on a proprietary,
+computationally expensive hashing algorithm.</p>
+<p>The server is currently deployed as a single, standalone 'go' binary.
+There is no session state to track or external calls to make so the
+server architecture should respond well to simple horizontal scaling. As
+there is expected to be a constrained set of client keys, the system
+should respond well to caching techniques. That's it for hints.</p>
+<h2 id="scope">Scope</h2>
+<p>This runbook describes the operational theory and practice for the
+production system powering the Unicorn Rentals website. The primary
+audience is the DevOps team running the site. The DevOps team is
+responsible for deploying code, scaling the site in response to load,
+maintaining our published SLA's (including response time and uptime),
+disaster recovery, troubleshooting activities and any monitoring and
+alerting activities required to meet these objectives.</p>
+<h2 id="infrastructure-cost">Infrastructure Cost</h2>
+<p>Here at Unicorn Rentals we know that it takes money to make money. You
+will be charged $8 for every 15 minutes of EC2 usage. For example, if
+you have one EC2 instance running for 3 minutes and terminate it, you
+will be charged $8. If you have 2 instances running for 13 minutes, you
+will be charged $16. So make sure you only provision what you need!</p>
+<h2 id="player-dashboard">Player Dashboard</h2>
+<p>The dashboard can be accessed by going to <span class="underline"><a href="http://dashboard.awsgameday.io/">http://dashboard.awsgameday.io</a></span>.
+ It will prompt you to enter your Team Hash. This team hash can be found
+ on the front page of your runbook, or on a piece of paper handed to you
+ earlier today. </p>
+<p>Once you login to the dashboard, it's time to set your team name. 
+Please click on the "Set Team Name" button on the dashboard and enter a 
+team name. Keep in mind that this team name cannot be changed once set 
+and will represent your team on the scoreboard. The scoreboard team at 
+Unicorn.Rentals did not have the motivation to make the scoreboard 
+private so keep in mind it is a public site and that team names should 
+be created with that in mind. Any inappropriate team names will be 
+renamed by the Unicorn.Rentals board of directors.</p>
+<p><img src="Event%20Engine%20-%20Team%20Dashboard_files/dashboard1.png" style="width:6.7in;height:8.5in"></p>
+<p>The dashboard has a few key components that you will interact with throughout the game.</p>
+<ol>
+<li><p>The top bar of the dashboard has a series of buttons that allow 
+you to: 1) Access your score events, 2) Access the scoreboard, 3) Set 
+your team name (can only be done once), 4) Request invite to Slack 
+channel for team collaboration and chatting, and 5) Access your team's 
+AWS account (&lt;-- this is important!)</p>
+</li>
+<li><p>Below this bar you will see a list of modules enabled for this 
+game. Each module can define outputs and inputs. In the example above, 
+the module has no outputs, but does have one input. For this module, you
+ will provide a URL to your order processor so we can send you order 
+(and you can get points).</p>
+</li>
+<li><p>Below the modules is a list of minigames that your team can 
+attempt to play. Each minigame has instructions you need to open in 
+order to begin the game and find the answer. Once you have answer, you 
+can type it into the answer box and submit.</p>
+</li>
+</ol>
+<p>NOTE: Once you set your team name, and your team name is approved by 
+the UnicornRentals collective, additional options will appear on the 
+dashboard. These options include your team score, rank, and trend, as 
+well as access to the scoreboard via the "Score Events" button.</p>
+<h2 id="score-events-and-scoreboard">Score Events and Scoreboard</h2>
+<p>If you click on the “Scoreboard” link on the Player Dashboard, it 
+will open a window to the Scoreboard. The Scoreboard is where you will 
+be able to track your progress as a team against all the players in the 
+room.</p>
+<p><img src="Event%20Engine%20-%20Team%20Dashboard_files/scoreboard1.png" style="width:6.7in;height:2.12569in"></p>
+<p>To get a deeper view on the performance of your individual team, you 
+can click on the "Score Events" button on the player dashboard to access
+ your point-by-point breakdown. </p>
+<p><img src="Event%20Engine%20-%20Team%20Dashboard_files/scoreevents1.png" style="width:6.7in;height:4.5in"></p>
+<p>This page has two sections to pay attention to:</p>
+<ol>
+<li><p>Each row lists every score event that your team has generated. 
+The "Source" column tells you where the point awards or deductions came 
+from. The "Points" column will tell you how many points you got or lost.</p>
+</li>
+<li><p>The "Reason" column will tell you the reason you got the points 
+or lost the points. Pay very close attention to this column when you are
+ losing points in order to understsand what is going on and how to fix 
+the problems.</p>
+</li>
+</ol>
+<h2 id="references">References</h2>
+<ol>
+<li><p>The server application is deployed,as a 'go' binary compiled from
+source rumored to be stored in a github repository. However, the
+name of of this repository is unknown to the current operations and
+development staff.</p>
+</li>
+<li><p>The server application can handle about 5 connections before
+starting to get really slow. Be careful about overloading, and watch
+for 503s when the queue fills. You can try restarting the app or
+server if it starts to get backed up.</p>
+</li>
+<li><p>The server application is an x86 statically linked, unstripped ELF
+executable found here:
+<a href="https://s3-us-west-2.amazonaws.com/gameday-classic-resources/server">https://s3-us-west-2.amazonaws.com/gameday-classic-resources/server</a></p>
+</li>
+<li><p>The base OS we have chosen is <a href="https://aws.amazon.com/amazon-linux-ami/">Amazon
+Linux</a>. This distribution
+was selected for it's broad industry support, stability,
+availability of support and excellent integration with AWS. This
+distributions was selected by SecOps based on their requirements for
+platform hardening.</p>
+</li>
+<li><p>Architecture was moved to AWS as part of go-to-market plan.
+Operating the AWS CLI
+(<a href="http://docs.aws.amazon.com/cli/latest/userguide/installing.html">http://docs.aws.amazon.com/cli/latest/userguide/installing.html</a>)
+is a huge help.</p>
+</li>
+</ol>
+<p><img src="Event%20Engine%20-%20Team%20Dashboard_files/image5.png" style="width:1.99663in;height:4.48914in"></p>
+<p>Unicorn_High_Level_AWS</p>
+<ol>
+<li><p>When working with AWS, only the following roles are allowed by
+SecOps... and finance:</p>
+<ul>
+<li><p>ec2</p>
+</li>
+<li><p>s3</p>
+</li>
+<li><p>ebs</p>
+</li>
+<li><p>route53</p>
+</li>
+<li><p>ecs</p>
+</li>
+<li><p>cfn</p>
+</li>
+<li><p>elasticache</p>
+</li>
+<li><p>cloudwatch</p>
+</li>
+<li><p>sns</p>
+</li>
+<li><p>cloudtrail</p>
+</li>
+<li><p>config</p>
+</li>
+<li><p>vpc</p>
+</li>
+<li><p>cloudfront</p>
+</li>
+<li><p>trusted advisor</p>
+</li>
+<li><p>service catalog</p>
+</li>
+</ul>
+</li>
+<li><p>Getting bored of writing this silly thing. Who needs it?</p>
+</li>
+</ol>
+<h2 id="application-system-architecture">Application System Architecture</h2>
+<p>Client &lt;-&gt; Server. Pretty sure anyway. What else is needed here?</p>
+<p><img src="Event%20Engine%20-%20Team%20Dashboard_files/image6.png" alt="Unicorn_Data_Flow" style="width:5.95in;height:3.94091in"></p>
+<p>Unicorn_Data_Flow</p>
+<h2 id="on-line-operations">On-line Operations</h2>
+<h3 id="update-application">Update Application</h3>
+<ul>
+<li><p>Our Server code is downloaded on first-boot via a script provided by
+AWS as 'User Data'</p>
+</li>
+<li><p>The User Data is stored in the Auto Scaling Group 'Launch
+Configuration':</p>
+</li>
+</ul>
+<!-- -->
+<ul>
+<li>$ aws autoscaling describe-launch-configurations --query
+LaunchConfigurations[0].UserData | base64 --decode</li>
+</ul>
+<blockquote>
+<p>!/bin/bash</p>
+<p>wget <em>&lt; \</em>binary location* &gt;*<br>chmod +x server<br>./server<br># Reboot if the server crashes<br>shutdown -h now</p>
+<p>Here is an overview of the AutoScaling Group Launch Configuration:<br><img src="Event%20Engine%20-%20Team%20Dashboard_files/image7.png" alt="Unicorn_AutoScaling_Flow" style="width:2.16538in;height:5.81947in"></p>
+</blockquote>
+<ol>
+<li><p>Make a new Launch Configuration based on the old one
+(<a href="http://docs.aws.amazon.com/AutoScaling/latest/DeveloperGuide/WorkingWithLaunchConfig.html">http://docs.aws.amazon.com/AutoScaling/latest/DeveloperGuide/WorkingWithLaunchConfig.html</a>)</p>
+</li>
+<li><p>Update the location of the server code downloaded from S3 in 'User
+Data' section.</p>
+</li>
+<li><p>Associate this new launch configuration with the Auto Scaling group.</p>
+</li>
+<li><p>Scale-up new group / scale-in old group</p>
+</li>
+<li><p>Make sure the instance can see the S3 bucket on launch (default
+route via IGW in subnet).</p>
+</li>
+</ol>
+<h3 id="add-ssh-key-to-instance">Add ssh-key to instance</h3>
+<ol>
+<li><p>Create an ssh-keypair
+(<a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html">http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html</a>)</p>
+</li>
+<li><p>Update Launch Configuration (Same procedure as 'Update Application')</p>
+</li>
+<li><p>Yes, this means you must relaunch the instances.</p>
+</li>
+</ol>
+<h3 id="update-auto-scaling-policy">Update Auto Scaling Policy</h3>
+<blockquote>
+<p>Never tried this! Check out
+<a href="http://docs.aws.amazon.com/AutoScaling/latest/DeveloperGuide/scaling/_typesof.html">http://docs.aws.amazon.com/AutoScaling/latest/DeveloperGuide/scaling\_typesof.html</a></p>
+</blockquote>
+<h2 id="troubleshooting-procedures">Troubleshooting Procedures</h2>
+<h3 id="networking-walkthrough">Networking walkthrough</h3>
+<blockquote>
+<p>The AWS VPC / ELB environment must be healthy for the application to
+work. All production traffic flows through the ELB on both ingress and
+egress:</p>
+</blockquote>
+<p><img src="Event%20Engine%20-%20Team%20Dashboard_files/image8.png" alt="Unicorn_Detail_Network" style="width:5.95in;height:4.38829in"></p>
+<p>Unicorn_Detail_Network</p>
+<ol>
+<li><p>Check the Security Group settings for your instances</p>
+<ol>
+<li>Make sure all required ports are Allowed</li>
+</ol>
+</li>
+<li><p>Check the Routing tables on your subnets</p>
+<ol>
+<li><p>Make sure the routing tables are applied to each subnet</p>
+</li>
+<li><p>'Default' table applies to all subnets without an explicit
+definition</p>
+</li>
+<li><p>Make sure the routing table has the appropriate rules</p>
+</li>
+</ol>
+</li>
+<li><p>Things to check in the the VPC that Ops has broken in the last six -
+12 months.</p>
+<ol>
+<li>Instances up?</li>
+</ol>
+<!-- -->
+<ol>
+<li>Instance ‘up’ in the Auto Scaling group?</li>
+</ol>
+<!-- -->
+<ol>
+<li><p>Subnets?</p>
+<ol>
+<li><p>Subnet 'cider'??? What did that guy say it was called? Is it
+big enough???</p>
+</li>
+<li><p>Are the subnets added to the Elastic Load Balancer?</p>
+</li>
+<li><p>Are the subnets added to the Auto Scaling Group?</p>
+</li>
+</ol>
+</li>
+<li><p>Routes correct / intact? See diagram.</p>
+</li>
+<li><p>ACLs: set on subet. Too restrictive/permissive?</p>
+</li>
+<li><p>Security groups?</p>
+</li>
+<li><p>IGW? Do we have routes to flow traffic through the IGW? Required
+to grab the server code from S3.</p>
+</li>
+<li><p>Route53 records? Are the records pointing to the correct
+resources?</p>
+</li>
+</ol>
+</li>
+<li><p>New application test utility!</p>
+</li>
+</ol>
+<blockquote>
+<p><a href="https://s3-us-west-2.amazonaws.com/gameday-classic-resources/server-bang.(linux|osx|windows)">https://s3-us-west-2.amazonaws.com/gameday-classic-resources/server-bang.(linux|osx|windows)</a>  </p>
+<p>./server-bang.$arch &lt;server URL&gt;</p>
+</blockquote>
+<ul>
+<li><p>You can try ssh'ing to the node and checking out the application --</p>
+<blockquote>
+<p>it runs on port 80: thats about all I know. You must install an
+ssh key first (see 'Add ssh-key to instance', above)</p>
+</blockquote>
+</li>
+<li><p>As mentioned, the server process can get slow if it is handling too</p>
+<blockquote>
+<p>many connections. Try restarting.</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="change-management">Change Management</h2>
+<p>HAH!</p>
+<h2 id="system-monitoring">System Monitoring</h2>
+<ul>
+<li><p>Application monitoring: <a href="https://scoreboard.dev.awsgameday.io/">https://scoreboard.dev.awsgameday.io</a></p>
+</li>
+<li><p>How to check ELB metrics?<br><a href="http://docs.aws.amazon.com/AutoScaling/latest/DeveloperGuide/policy/_creating.html">http://docs.aws.amazon.com/AutoScaling/latest/DeveloperGuide/policy\_creating.html</a>
+<a href="http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/elb-cloudwatch-metrics.html">http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/elb-cloudwatch-metrics.html</a></p>
+</li>
+</ul>
+<h2 id="to-do">To Do</h2>
+<ul>
+<li><p>Explore elasticache, cloudfront: Didn't Jayme say this might speed
+things up?</p>
+</li>
+<li><p>How to test HA? Automate DR.</p>
+</li>
+<li><p>Refactor infrastructure using container architecture</p>
+</li>
+</ul>
+</markdown-to-html>
+</div></app-documentation-viewer>  
+</div></app-root><script type="text/javascript" src="Event%20Engine%20-%20Team%20Dashboard_files/inline.js"></script><script type="text/javascript" src="Event%20Engine%20-%20Team%20Dashboard_files/polyfills.js"></script><script type="text/javascript" src="Event%20Engine%20-%20Team%20Dashboard_files/scripts.js"></script><script type="text/javascript" src="Event%20Engine%20-%20Team%20Dashboard_files/main.js"></script></body></html>
